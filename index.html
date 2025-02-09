@@ -29,6 +29,7 @@
         let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
         let dx = box, dy = 0;
         let score = 0;
+        let game;
 
         document.addEventListener("keydown", changeDirection);
 
@@ -46,7 +47,7 @@
             ctx.fillRect(food.x, food.y, box, box);
             
             ctx.fillStyle = "lime";
-            snake.forEach((segment, index) => {
+            snake.forEach(segment => {
                 ctx.fillRect(segment.x, segment.y, box, box);
             });
             
@@ -59,14 +60,16 @@
             }
             
             if (newHead.x < 0 || newHead.x >= canvas.width || newHead.y < 0 || newHead.y >= canvas.height || snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                clearInterval(game);
                 alert("¡Game Over! Puntuación: " + score);
                 document.location.reload();
+                return;
             }
             
             snake.unshift(newHead);
         }
 
-        setInterval(draw, 100);
+        game = setInterval(draw, 100);
     </script>
 </body>
 </html>

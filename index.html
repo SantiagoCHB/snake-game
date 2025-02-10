@@ -52,11 +52,17 @@
         const ctx = canvas.getContext("2d");
 
         const box = 20;
-        let snake = [{ x: 10 * box, y: 10 * box }];
-        let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-        let dx = box, dy = 0;
-        let score = 0;
-        let game;
+        let snake, food, dx, dy, score, game;
+
+        function resetGame() {
+            snake = [{ x: 10 * box, y: 10 * box }];
+            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            dx = box;
+            dy = 0;
+            score = 0;
+            clearInterval(game);
+            game = setInterval(draw, 100);
+        }
 
         document.addEventListener("keydown", changeDirection);
         document.getElementById("up").addEventListener("click", () => { if (dy === 0) { dx = 0; dy = -box; }});
@@ -87,6 +93,7 @@
             if (newHead.x < 0 || newHead.x >= canvas.width || newHead.y < 0 || newHead.y >= canvas.height || snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
                 clearInterval(game);
                 alert("¡Game Over! Puntuación: " + score);
+                resetGame();
                 return;
             }
             
@@ -100,7 +107,7 @@
             }
         }
 
-        game = setInterval(draw, 100);
+        resetGame();
     </script>
 </body>
 </html>

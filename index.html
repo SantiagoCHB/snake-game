@@ -34,11 +34,26 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        #score {
+            font-size: 20px;
+            margin: 10px;
+        }
+        #reset {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ff4444;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h1>Juego de Snake</h1>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <p id="score">Puntuación: 0</p>
+    <canvas id="gameCanvas" width="360" height="360"></canvas>
     <div class="controls">
         <button class="btn" id="up">⬆</button>
     </div>
@@ -47,35 +62,41 @@
         <button class="btn" id="down">⬇</button>
         <button class="btn" id="right">➡</button>
     </div>
+    <button id="reset">Reiniciar Juego</button>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("score");
+        const resetButton = document.getElementById("reset");
 
         const box = 20;
-        let snake, food, dx, dy, score, game;
+        let snake, food, dx, dy, score, game, lastDirection;
 
         function resetGame() {
-            snake = [{ x: 10 * box, y: 10 * box }];
-            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            snake = [{ x: 8 * box, y: 8 * box }];
+            food = { x: Math.floor(Math.random() * 18) * box, y: Math.floor(Math.random() * 18) * box };
             dx = box;
             dy = 0;
             score = 0;
+            lastDirection = "RIGHT";
+            scoreDisplay.innerText = "Puntuación: " + score;
             clearInterval(game);
             game = setInterval(draw, 100);
         }
 
         document.addEventListener("keydown", changeDirection);
-        document.getElementById("up").addEventListener("click", () => { if (dy === 0) { dx = 0; dy = -box; }});
-        document.getElementById("down").addEventListener("click", () => { if (dy === 0) { dx = 0; dy = box; }});
-        document.getElementById("left").addEventListener("click", () => { if (dx === 0) { dx = -box; dy = 0; }});
-        document.getElementById("right").addEventListener("click", () => { if (dx === 0) { dx = box; dy = 0; }});
+        document.getElementById("up").addEventListener("click", () => changeDirection({ keyCode: 38 }));
+        document.getElementById("down").addEventListener("click", () => changeDirection({ keyCode: 40 }));
+        document.getElementById("left").addEventListener("click", () => changeDirection({ keyCode: 37 }));
+        document.getElementById("right").addEventListener("click", () => changeDirection({ keyCode: 39 }));
+        resetButton.addEventListener("click", resetGame);
 
         function changeDirection(event) {
             const key = event.keyCode;
-            if (key === 37 && dx === 0) { dx = -box; dy = 0; }
-            if (key === 38 && dy === 0) { dx = 0; dy = -box; }
-            if (key === 39 && dx === 0) { dx = box; dy = 0; }
-            if (key === 40 && dy === 0) { dx = 0; dy = box; }
+            if (key === 37 && lastDirection !== "RIGHT") { dx = -box; dy = 0; lastDirection = "LEFT"; }
+            if (key === 38 && lastDirection !== "DOWN") { dx = 0; dy = -box; lastDirection = "UP"; }
+            if (key === 39 && lastDirection !== "LEFT") { dx = box; dy = 0; lastDirection = "RIGHT"; }
+            if (key === 40 && lastDirection !== "UP") { dx = 0; dy = box; lastDirection = "DOWN"; }
         }
 
         function draw() {
@@ -93,7 +114,6 @@
             if (newHead.x < 0 || newHead.x >= canvas.width || newHead.y < 0 || newHead.y >= canvas.height || snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
                 clearInterval(game);
                 alert("¡Game Over! Puntuación: " + score);
-                resetGame();
                 return;
             }
             
@@ -101,7 +121,8 @@
             
             if (newHead.x === food.x && newHead.y === food.y) {
                 score++;
-                food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+                scoreDisplay.innerText = "Puntuación: " + score;
+                food = { x: Math.floor(Math.random() * 18) * box, y: Math.floor(Math.random() * 18) * box };
             } else {
                 snake.pop();
             }
